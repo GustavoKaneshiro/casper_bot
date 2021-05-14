@@ -6,7 +6,11 @@ import './App.css';
 const axios = require('axios');
 
 const App = () => {
-
+  const [login, setLogin] = useState({
+    username: '',
+    password: ''
+  })
+  const [logged, setLogged] = useState(false);
   const [news, setNews] = useState([]);
   const [modal, setModal] = useState(false);
   const [formNew, setFormNew] = useState({
@@ -27,7 +31,7 @@ const App = () => {
         console.log(err);
       }
     }
-
+    
     setFormNew({
       title: '',
       description: '',
@@ -37,6 +41,28 @@ const App = () => {
     });
     toggle();
   };
+
+  const handleLogin = async () =>{
+    try{
+      const resp = await axios.post('https://peaceful-cerulean-judge.glitch.me/login', login);
+      
+      if(resp.data[0].username === 'admin')
+        setLogged(true);
+      
+      setLogin({
+        username : '',
+        password : ''
+      });  
+
+    } catch(err){
+      console.log(err);
+      setLogin({
+        username : '',
+        password : ''
+      });  
+    }
+  };
+
   const toggle = () => setModal(!modal);
 
   useEffect(()=>{
@@ -52,7 +78,22 @@ const App = () => {
   return (
      <div className="App">
       <header className="App-header">
-      <Button color="danger" onClick={toggle}>Add Notíca  </Button>
+      {logged && <Button color="danger" onClick={toggle}>Adicionar Notíca  </Button>}
+
+      {!logged && 
+        <Form inline>
+                <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
+                  <Label for="loginText" className="mr-sm-2">Login</Label>
+                  <Input type="text" name="loginText" id="loginText" style={{width:'30%'}} value={login.username} onChange={e => setLogin({...login, username:e.target.value})}/>
+                </FormGroup>             
+                <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
+                  <Label for="passwordText" className="mr-sm-2">Password</Label>
+                  <Input type="password" name="passwordText" id="passwordText" style={{width:'30%'}} value={login.password} onChange={e => setLogin({...login, password:e.target.value})}/>
+                </FormGroup>            
+              <Button onClick={handleLogin}>Sign In</Button>            
+        </Form>
+      }
+
       <Table bordered hover>
         <thead>
         <tr>
