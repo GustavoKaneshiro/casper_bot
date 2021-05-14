@@ -13,6 +13,8 @@ const App = () => {
   const [logged, setLogged] = useState(false);
   const [news, setNews] = useState([]);
   const [modal, setModal] = useState(false);
+  const [deleteNew, setDeleteNew] = useState('');
+  const [modalDelete, setModalDelete] = useState(false);
   const [formNew, setFormNew] = useState({
     title: '',
     description: '',
@@ -20,6 +22,30 @@ const App = () => {
     link: '',
     image: ''
   });
+
+  const handleDeleteModal =  (title) =>{
+    console.log("oi");
+    toggleDelete();
+    setDeleteNew(title);  
+  }
+
+  const toggleDelete = () => {setModalDelete(!modalDelete)}
+
+  const handleDelete = async () =>{
+    try{
+      const resp = await axios.post('https://peaceful-cerulean-judge.glitch.me/delete', {title:deleteNew});
+      if(resp.data.protocol41){
+        alert("Deletado");
+      }
+      else{
+        alert("erro");
+      }
+      setDeleteNew('');
+      toggleDelete();
+    } catch (err){
+      console.log(err);
+    }
+  }
 
   const handleAddNew = async () =>{
     console.log(formNew);
@@ -93,7 +119,8 @@ const App = () => {
               <Button onClick={handleLogin}>Sign In</Button>            
         </Form>
       }
-
+      </header>
+      <body>
       <Table bordered hover>
         <thead>
         <tr>
@@ -102,6 +129,7 @@ const App = () => {
             <th className='descricao'>Descrição</th>
             <th className='link'>Link</th>
             <th className='imagem'>Link de Imagem</th>
+            {logged &&<th className="actions">Ações</th>}
         </tr>
         </thead>
         <tbody>
@@ -115,6 +143,9 @@ const App = () => {
               <td className='descricao'>{result.description}</td>
               <td className='link'>{result.link}</td>
               <td className='imagem'>{result.image}</td>
+              {logged &&<td className='actions'>
+                <Button color="danger" onClick={()=>handleDeleteModal(result.title)}>Delete</Button>
+              </td>}
             </tr>)
           })
         }
@@ -160,7 +191,20 @@ const App = () => {
           <Button color="secondary" onClick={toggle}>Cancel</Button>
         </ModalFooter>
       </Modal>
-      </header>
+
+
+
+      <Modal isOpen={modalDelete} toggle={toggleDelete}>
+        <ModalBody>
+          <span>Deseja excluir essa notícia?</span>
+          <p>{deleteNew}</p>
+        </ModalBody>
+        <ModalFooter>
+          <Button color="danger" onClick={handleDelete}>Deletar</Button>
+          <Button color="secondary" onClick={() => {setDeleteNew('');toggleDelete()}}>Cancelar</Button>
+        </ModalFooter>
+      </Modal>
+      </body>
     </div>
   )
 }

@@ -11,7 +11,7 @@ tbody{
   overflow: scroll;
 }
 
-.tema{
+.tema, .actions{
   width: 1.5em;
   height: auto;
   word-wrap: break-word;
@@ -29,3 +29,6 @@ tbody{
   word-wrap: break-word;
 }
 
+Input{
+  min-width: none;
+}
