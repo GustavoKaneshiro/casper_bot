@@ -6,22 +6,52 @@ import './App.css';
 const axios = require('axios');
 
 const App = () => {
+
+  //////////////////Login Hooks
   const [login, setLogin] = useState({
     username: '',
     password: ''
   })
   const [logged, setLogged] = useState(false);
+
+  const handleLogin = async () =>{
+    try{
+      const resp = await axios.post('https://peaceful-cerulean-judge.glitch.me/login', login);
+      
+      if(resp.data[0].username === 'admin')
+        setLogged(true);
+      
+      setLogin({
+        username : '',
+        password : ''
+      });  
+
+    } catch(err){
+      console.log(err);
+      setLogin({
+        username : '',
+        password : ''
+      });  
+    }
+  };
+
+  //////////////////Table Hooks
   const [news, setNews] = useState([]);
-  const [modal, setModal] = useState(false);
+
+  useEffect(()=>{
+    const fetchData = async () =>{
+      await axios.get('https://peaceful-cerulean-judge.glitch.me/', )
+                                .then((fetchedData) =>{
+                                  setNews(fetchedData.data);
+                                });
+    }
+    fetchData();
+  }, []);
+  
+
+  //////////////////Delete Hooks
   const [deleteNew, setDeleteNew] = useState('');
   const [modalDelete, setModalDelete] = useState(false);
-  const [formNew, setFormNew] = useState({
-    title: '',
-    description: '',
-    category: '',
-    link: '',
-    image: ''
-  });
 
   const handleDeleteModal =  (title) =>{
     console.log("oi");
@@ -47,6 +77,18 @@ const App = () => {
     }
   }
 
+  /////////////////Add Hooks
+  const [modal, setModal] = useState(false);
+  const [formNew, setFormNew] = useState({
+    title: '',
+    description: '',
+    category: '',
+    link: '',
+    image: ''
+  });
+
+  const toggle = () => setModal(!modal);
+
   const handleAddNew = async () =>{
     console.log(formNew);
     if(formNew.category !== ''){
@@ -68,44 +110,16 @@ const App = () => {
     toggle();
   };
 
-  const handleLogin = async () =>{
-    try{
-      const resp = await axios.post('https://peaceful-cerulean-judge.glitch.me/login', login);
-      
-      if(resp.data[0].username === 'admin')
-        setLogged(true);
-      
-      setLogin({
-        username : '',
-        password : ''
-      });  
-
-    } catch(err){
-      console.log(err);
-      setLogin({
-        username : '',
-        password : ''
-      });  
-    }
-  };
-
-  const toggle = () => setModal(!modal);
-
-  useEffect(()=>{
-    const fetchData = async () =>{
-      await axios.get('https://peaceful-cerulean-judge.glitch.me/', )
-                                .then((fetchedData) =>{
-                                  setNews(fetchedData.data);
-                                });
-    }
-    fetchData();
-  }, []);
   
+
+  ///////////////Return
   return (
      <div className="App">
       <header className="App-header">
-      {logged && <Button color="danger" onClick={toggle}>Adicionar Notíca  </Button>}
+      {/*Add Notícia Button*/}  
+      {logged && <Button color="danger" onClick={toggle}>Adicionar Notícia  </Button>}
 
+      {/*Login Form*/}
       {!logged && 
         <Form inline>
                 <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
@@ -121,6 +135,7 @@ const App = () => {
       }
       </header>
       <body>
+      {/*Tabela com as notícias*/}
       <Table bordered hover>
         <thead>
         <tr>
@@ -152,7 +167,7 @@ const App = () => {
         </tbody>
       </Table>
       
-
+      {/*Modal de Adicionar Notícia*/}  
       <Modal isOpen={modal} toggle={toggle} backdrop={true} keyboard={true}>
         <ModalHeader toggle={toggle}>Modal title</ModalHeader>
         <ModalBody>
@@ -193,7 +208,7 @@ const App = () => {
       </Modal>
 
 
-
+      {/*Modal de Deletar Notícia*/}  
       <Modal isOpen={modalDelete} toggle={toggleDelete}>
         <ModalBody>
           <span>Deseja excluir essa notícia?</span>
